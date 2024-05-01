@@ -260,5 +260,24 @@ def get_result(jobid: str) -> tuple:
         logging.error(f"Error retrieving result for job {jobid}: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
+@app.route('/help', methods=['GET'])
+def show_routes() -> tuple:
+    """
+    Display information about all the routes in the Flask application.
+
+    Returns:
+        tuple: A tuple containing the JSON response and HTTP status code.
+    """
+    routes = {}
+    for rule in app.url_map.iter_rules():
+        if rule.endpoint != 'static':
+            doc = app.view_functions[rule.endpoint].__doc__
+            doc = ' '.join(doc.split()) if doc else ""
+            routes[str(rule)] = {
+                'methods': ','.join(rule.methods),
+                'doc': doc,
+            }
+    return jsonify(routes), 200
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
