@@ -1,0 +1,18 @@
+# Ignore CSV files
+*.csv
+
+# Ignore JSON files
+*.json
+
+# Ignore XML files
+*.xml
+
+# Ignore YAML files
+*.yaml
+
+# Ignore pycache
+*.pyc
+
+# Ignore database files
+*.db
+*.rdb
