@@ -21,7 +21,7 @@ services:
         environment:
             - REDIS_HOST=redis-db
             - REDIS_PORT=6379
-            - LOG_LEVEL=WARNING
+            - LOG_LEVEL=DEBUG
     worker:
         image: username/worker:1.0
         build:
