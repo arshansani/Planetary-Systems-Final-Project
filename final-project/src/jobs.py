@@ -27,7 +27,7 @@ def _generate_jid() -> str:
     """
     return str(uuid.uuid4())
 
-def _instantiate_job(jid: str, status: str, start: int, end: int) -> dict:
+def _instantiate_job(jid: str, status: str, bin_size: float) -> dict:
     """
     Create the job object description as a python dictionary.
 
@@ -42,8 +42,7 @@ def _instantiate_job(jid: str, status: str, start: int, end: int) -> dict:
     """
     return {'id': jid,
             'status': status,
-            'start': start,
-            'end': end }
+            'bin_size': bin_size}
 
 def _save_job(jid: str, job_dict: dict) -> None:
     """
@@ -68,7 +67,7 @@ def _queue_job(jid: str) -> None:
     logging.info(f"Job {jid} added to the queue")
     return
 
-def add_job(start: int, end: int, status: str = "submitted") -> dict:
+def add_job(bin_size: float, status: str = "submitted") -> dict:
     """
     Add a job to the redis queue.
     
@@ -81,10 +80,10 @@ def add_job(start: int, end: int, status: str = "submitted") -> dict:
         dict: The job object description.
     """
     jid = _generate_jid()
-    job_dict = _instantiate_job(jid, status, int(start), int(end))
+    job_dict = _instantiate_job(jid, status, float(bin_size))
     _save_job(jid, job_dict)
     _queue_job(jid)
-    logging.info(f"Job {jid} added with start={start}, end={end}, status={status}")
+    logging.info(f"Job {jid} added with bin_size={bin_size}, status={status}")
     return job_dict
 
 def get_job_by_id(jid: str) -> dict:

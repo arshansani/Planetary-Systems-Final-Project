@@ -1,5 +1,5 @@
 # !/usr/bin/env python3
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 import requests
 import redis
 import logging
@@ -238,14 +238,15 @@ def get_planets_by_hostname(hostname: str) -> tuple:
 @app.route('/jobs', methods=['POST'])
 def submit_route() -> tuple:
     """
-    Submit a job to the job queue.
+    Submit a job to plot the histogram of planet size distribution.
 
     Returns:
         tuple: A tuple containing the JSON response and HTTP status code.
     """
     data = request.get_json()
     logging.debug(f"Received JSON data: {data}")
-    job_dict = add_job(data['start'], data['end'])
+    bin_size = data.get('bin_size', 1.0)  # Default bin size is 1.0
+    job_dict = add_job(bin_size)
     logging.debug(f"Job added: {job_dict}")
     return job_dict, 200
 
@@ -291,12 +292,11 @@ def get_result(jobid: str) -> tuple:
         if job:
             job_status = job['status']
             if job_status == 'complete':
-                result_json = rdb.get(jobid)
-                if result_json:
-                    result = json.loads(result_json)
-                    return jsonify({"status": "success", "result": result}), 200
+                plot_data = rdb.get(jobid)
+                if plot_data:
+                    return Response(plot_data, mimetype='image/png'), 200
                 else:
-                    return jsonify({"status": "error", "message": "Result not found"}), 404
+                    return jsonify({"status": "error", "message": "Plot data not found"}), 404
             elif job_status == 'failed':
                 return jsonify({"status": "error", "message": "Job failed"}), 500
             else:
