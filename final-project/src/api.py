@@ -141,6 +141,40 @@ def get_exoplanet_data(pl_name: str) -> tuple:
         logging.error(f"Error retrieving exoplanet data: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
+@app.route('/exoplanets/radius', methods=['GET'])
+def get_exoplanets_by_radius() -> tuple:
+    """
+    Retrieve exoplanets within a specified radius range.
+
+    Query Parameters:
+        min_radius (float): The minimum radius value in Earth radii.
+        max_radius (float): The maximum radius value in Earth radii.
+
+    Returns:
+        tuple: A tuple containing the JSON response and HTTP status code.
+    """
+    try:
+        min_radius = float(request.args.get('min_radius', 0))
+        max_radius = float(request.args.get('max_radius', float('inf')))
+
+        exoplanet_names = []
+        for key in rd.keys():
+            exoplanet_json = rd.get(key)
+            if exoplanet_json:
+                exoplanet = json.loads(exoplanet_json)
+                radius = exoplanet.get('pl_rade')
+                if radius is not None and min_radius <= radius <= max_radius:
+                    exoplanet_names.append(exoplanet['pl_name'])
+
+        logging.info(f"Retrieved {len(exoplanet_names)} exoplanet names within radius range {min_radius} - {max_radius}")
+        return jsonify(exoplanet_names), 200
+    except ValueError as e:
+        logging.error(f"Invalid radius range: {e}")
+        return jsonify({"status": "error", "message": "Invalid radius range"}), 400
+    except Exception as e:
+        logging.error(f"Error retrieving exoplanet names by radius: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 @app.route('/jobs', methods=['POST'])
 def submit_route() -> tuple:
     """
