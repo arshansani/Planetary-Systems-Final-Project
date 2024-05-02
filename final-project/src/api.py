@@ -103,18 +103,52 @@ def delete_data() -> tuple:
 @app.route('/exoplanets', methods=['GET'])
 def get_exoplanet_names() -> tuple:
     """
-    Retrieve exoplanet host names from Redis.
+    Retrieve exoplanets based on query parameters.
+
+    Query Parameters:
+        min_radius (float): The minimum radius value in Earth radii.
+        max_radius (float): The maximum radius value in Earth radii.
+        method (str): The discovery method.
+        start_year (int): The start year for discovery.
+        end_year (int): The end year for discovery.
 
     Returns:
         tuple: A tuple containing the JSON response and HTTP status code.
     """
     try:
-        keys = rd.keys()
-        exoplanet_names = [key.decode('utf-8') for key in keys]
-        logging.info("Exoplanet host names retrieved from Redis")
+        min_radius = float(request.args.get('min_radius', 0))
+        max_radius = float(request.args.get('max_radius', float('inf')))
+        method = request.args.get('method')
+        start_year = request.args.get('start_year')
+        end_year = request.args.get('end_year')
+
+        if start_year:
+            start_year = int(start_year)
+        if end_year:
+            end_year = int(end_year)
+
+        exoplanet_names = []
+        for key in rd.keys():
+            exoplanet_json = rd.get(key)
+            if exoplanet_json:
+                exoplanet = json.loads(exoplanet_json)
+                radius = exoplanet.get('pl_rade')
+                discovery_method = exoplanet.get('discoverymethod')
+                discovery_year = exoplanet.get('disc_year')
+
+                if radius is not None and min_radius <= radius <= max_radius:
+                    if method is None or method == discovery_method:
+                        if start_year is None or (start_year and discovery_year >= start_year):
+                            if end_year is None or (end_year and discovery_year <= end_year):
+                                exoplanet_names.append(exoplanet['pl_name'])
+
+        logging.info(f"Retrieved {len(exoplanet_names)} exoplanets")
         return jsonify(exoplanet_names), 200
+    except ValueError as e:
+        logging.error(f"Invalid query parameter: {e}")
+        return jsonify({"status": "error", "message": "Invalid query parameter"}), 400
     except Exception as e:
-        logging.error(f"Error retrieving exoplanet host names: {e}")
+        logging.error(f"Error retrieving exoplanets: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/exoplanets/<pl_name>', methods=['GET'])
@@ -141,41 +175,7 @@ def get_exoplanet_data(pl_name: str) -> tuple:
         logging.error(f"Error retrieving exoplanet data: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route('/exoplanets/radius', methods=['GET'])
-def get_exoplanets_by_radius() -> tuple:
-    """
-    Retrieve exoplanets within a specified radius range.
-
-    Query Parameters:
-        min_radius (float): The minimum radius value in Earth radii.
-        max_radius (float): The maximum radius value in Earth radii.
-
-    Returns:
-        tuple: A tuple containing the JSON response and HTTP status code.
-    """
-    try:
-        min_radius = float(request.args.get('min_radius', 0))
-        max_radius = float(request.args.get('max_radius', float('inf')))
-
-        exoplanet_names = []
-        for key in rd.keys():
-            exoplanet_json = rd.get(key)
-            if exoplanet_json:
-                exoplanet = json.loads(exoplanet_json)
-                radius = exoplanet.get('pl_rade')
-                if radius is not None and min_radius <= radius <= max_radius:
-                    exoplanet_names.append(exoplanet['pl_name'])
-
-        logging.info(f"Retrieved {len(exoplanet_names)} exoplanet names within radius range {min_radius} - {max_radius}")
-        return jsonify(exoplanet_names), 200
-    except ValueError as e:
-        logging.error(f"Invalid radius range: {e}")
-        return jsonify({"status": "error", "message": "Invalid radius range"}), 400
-    except Exception as e:
-        logging.error(f"Error retrieving exoplanet names by radius: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-@app.route('/exoplanets/hosts', methods=['GET'])
+@app.route('/hosts', methods=['GET'])
 def get_host_stars() -> tuple:
     """
     Retrieve all unique host stars from the exoplanet data.
@@ -200,7 +200,7 @@ def get_host_stars() -> tuple:
         logging.error(f"Error retrieving host stars: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route('/exoplanets/hosts/<hostname>', methods=['GET'])
+@app.route('/hosts/<hostname>', methods=['GET'])
 def get_planets_by_hostname(hostname: str) -> tuple:
     """
     Retrieve all planets associated with a given host star.
@@ -233,6 +233,58 @@ def get_planets_by_hostname(hostname: str) -> tuple:
             return jsonify({"status": "error", "message": "No planets found for the specified host star"}), 404
     except Exception as e:
         logging.error(f"Error retrieving planets by hostname: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/facilities', methods=['GET'])
+def get_facilities() -> tuple:
+    """
+    Retrieve all unique discovery facilities.
+
+    Returns:
+        tuple: A tuple containing the JSON response and HTTP status code.
+    """
+    try:
+        facilities = set()
+        for key in rd.keys():
+            exoplanet_json = rd.get(key)
+            if exoplanet_json:
+                exoplanet = json.loads(exoplanet_json)
+                facility = exoplanet.get('disc_facility')
+                if facility:
+                    facilities.add(facility)
+
+        facilities_list = list(facilities)
+        logging.info(f"Retrieved {len(facilities_list)} unique discovery facilities")
+        return jsonify(facilities_list), 200
+    except Exception as e:
+        logging.error(f"Error retrieving discovery facilities: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/facilities/<facility_name>', methods=['GET'])
+def get_planets_by_facility(facility_name: str) -> tuple:
+    """
+    Retrieve all planets discovered by a specific facility.
+
+    Args:
+        facility_name (str): The name of the discovery facility.
+
+    Returns:
+        tuple: A tuple containing the JSON response and HTTP status code.
+    """
+    try:
+        exoplanet_names = []
+        for key in rd.keys():
+            exoplanet_json = rd.get(key)
+            if exoplanet_json:
+                exoplanet = json.loads(exoplanet_json)
+                facility = exoplanet.get('disc_facility')
+                if facility == facility_name:
+                    exoplanet_names.append(exoplanet['pl_name'])
+
+        logging.info(f"Retrieved {len(exoplanet_names)} exoplanets discovered by {facility_name}")
+        return jsonify(exoplanet_names), 200
+    except Exception as e:
+        logging.error(f"Error retrieving exoplanets by facility: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/jobs', methods=['POST'])
@@ -286,6 +338,9 @@ def get_result(jobid: str) -> tuple:
 
     Returns:
         tuple: A tuple containing the JSON response and HTTP status code.
+
+    Example:
+        curl -X GET -o histogram.png http://localhost:5000/results/<jobid>
     """
     try:
         job = get_job_by_id(jobid)
