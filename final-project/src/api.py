@@ -15,7 +15,7 @@ log_level = os.environ.get('LOG_LEVEL', 'WARNING')
 logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Constants
-URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+*+from+pscomppars&format=json"
+URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+pl_name,hostname,sy_snum,sy_pnum,discoverymethod,disc_year,disc_facility,pl_orbper,pl_orbsmax,pl_rade,pl_bmasse,pl_orbeccen,st_spectype,st_teff,st_rad,st_mass,st_met,st_logg,rastr,decstr,sy_dist,sy_vmag,sy_kmag,sy_gaiamag+from+pscomppars&format=json"
 
 def fetch_exoplanet_data() -> list:
     """
