@@ -175,6 +175,66 @@ def get_exoplanets_by_radius() -> tuple:
         logging.error(f"Error retrieving exoplanet names by radius: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
+@app.route('/exoplanets/hosts', methods=['GET'])
+def get_host_stars() -> tuple:
+    """
+    Retrieve all unique host stars from the exoplanet data.
+
+    Returns:
+        tuple: A tuple containing the JSON response and HTTP status code.
+    """
+    try:
+        host_stars = set()
+        for key in rd.keys():
+            exoplanet_json = rd.get(key)
+            if exoplanet_json:
+                exoplanet = json.loads(exoplanet_json)
+                hostname = exoplanet.get('hostname')
+                if hostname:
+                    host_stars.add(hostname)
+
+        host_stars_list = list(host_stars)
+        logging.info(f"Retrieved {len(host_stars_list)} unique host stars")
+        return jsonify(host_stars_list), 200
+    except Exception as e:
+        logging.error(f"Error retrieving host stars: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/exoplanets/hosts/<hostname>', methods=['GET'])
+def get_planets_by_hostname(hostname: str) -> tuple:
+    """
+    Retrieve all planets associated with a given host star.
+
+    Args:
+        hostname (str): The name of the host star.
+
+    Returns:
+        tuple: A tuple containing the JSON response and HTTP status code.
+    """
+    try:
+        exoplanet_names = []
+        for key in rd.keys():
+            exoplanet_json = rd.get(key)
+            if exoplanet_json:
+                exoplanet = json.loads(exoplanet_json)
+                if exoplanet.get('hostname') == hostname:
+                    exoplanet_names.append(exoplanet['pl_name'])
+
+        if exoplanet_names:
+            host_data = {
+                'hostname': hostname,
+                'num_planets': len(exoplanet_names),
+                'planets': exoplanet_names
+            }
+            logging.info(f"Retrieved {len(exoplanet_names)} planets for host star {hostname}")
+            return jsonify(host_data), 200
+        else:
+            logging.warning(f"No planets found for host star {hostname}")
+            return jsonify({"status": "error", "message": "No planets found for the specified host star"}), 404
+    except Exception as e:
+        logging.error(f"Error retrieving planets by hostname: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 @app.route('/jobs', methods=['POST'])
 def submit_route() -> tuple:
     """
