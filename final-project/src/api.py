@@ -110,15 +110,15 @@ def get_exoplanet_names() -> tuple:
     """
     try:
         keys = rd.keys()
-        exoplanet_hostnames = [key.decode('utf-8') for key in keys]
+        exoplanet_names = [key.decode('utf-8') for key in keys]
         logging.info("Exoplanet host names retrieved from Redis")
-        return jsonify(exoplanet_hostnames), 200
+        return jsonify(exoplanet_names), 200
     except Exception as e:
         logging.error(f"Error retrieving exoplanet host names: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route('/exoplanets/<pl_hostname>', methods=['GET'])
-def get_exoplanet_data(pl_hostname: str) -> tuple:
+@app.route('/exoplanets/<pl_name>', methods=['GET'])
+def get_exoplanet_data(pl_name: str) -> tuple:
     """
     Retrieve exoplanet data for a specific exoplanet host name from Redis.
 
@@ -129,13 +129,13 @@ def get_exoplanet_data(pl_hostname: str) -> tuple:
         tuple: A tuple containing the JSON response and HTTP status code.
     """
     try:
-        exoplanet_json = rd.get(pl_hostname)
+        exoplanet_json = rd.get(pl_name)
         if exoplanet_json:
             exoplanet_data = json.loads(exoplanet_json)
-            logging.info(f"Exoplanet data retrieved for {pl_hostname}")
+            logging.info(f"Exoplanet data retrieved for {pl_name}")
             return jsonify(exoplanet_data), 200
         else:
-            logging.warning(f"Exoplanet data not found for {pl_hostname}")
+            logging.warning(f"Exoplanet data not found for {pl_name}")
             return jsonify({"status": "error", "message": "Exoplanet not found"}), 404
     except Exception as e:
         logging.error(f"Error retrieving exoplanet data: {e}")
