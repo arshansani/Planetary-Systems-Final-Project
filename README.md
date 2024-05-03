@@ -115,6 +115,8 @@ Now the web application should be running with a public API point at `planetarys
 
  `pytest -v`
 
+ Now the flask API should be accessible locally on localhost:5000.
+
 
 ## API Examples & Result Interpretation
 
