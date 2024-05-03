@@ -15,8 +15,8 @@ log_level = os.environ.get('LOG_LEVEL', 'WARNING')
 logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(message)s')
 
 logging.debug(f"Logging level set to: {log_level}")
-logging.debug(f"Connecting to Redis at {os.environ.get('REDIS_HOST')}")
-logging.debug(f"Connecting to Redis at {os.environ.get('REDIS_PORT')}")
+logging.debug(f"Connecting to Redis at address: {os.environ.get('REDIS_HOST')}")
+logging.debug(f"Connecting to Redis at port: {os.environ.get('REDIS_PORT')}")
 logging.debug(f"Testing Redis connection...")
 logging.debug("Redis connection successful!" if rd.ping() else "Redis connection failed!")
 
