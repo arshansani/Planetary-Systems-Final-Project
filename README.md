@@ -93,7 +93,9 @@ NAME                             CLASS   HOSTS                                AD
 planetarysystems-flask-ingress   nginx   planetarysystems.coe332.tacc.cloud   129.114.36.240,129.114.36.49,129.114.36.83,129.114.38.92   80      23m
 ```
 
-Now the web application should be running with a public API point at `planetarysystems.coe332.tacc.cloud`
+Now the web application should be running with a public API point at:
+
+`planetarysystems.coe332.tacc.cloud`
 
 ## Building the Docker Image and Launching Containerized App and Redis using Docker Compose
 
@@ -126,8 +128,12 @@ The application provides several API endpoints to access different subsets of th
 ### Load Data
 
 ```python
-# Request:
+# Request Locally (Docker):
 curl -X POST http://localhost:5000/data
+```
+```python
+# Request Public API (Kubernetes):
+curl -X POST planetarysystems.coe332.tacc.cloud/data
 ```
 ```python
 # Expected Output:
@@ -141,8 +147,12 @@ curl -X POST http://localhost:5000/data
 ### Get All Data
 
 ```python
-# Request:
+# Request Locally (Docker):
 curl -X GET http://localhost:5000/data
+```
+```python
+# Request Public API (Kubernetes):
+curl -X GET planetarysystems.coe332.tacc.cloud/data
 ```
 ```python
 # Expected Output:
@@ -182,8 +192,12 @@ curl -X GET http://localhost:5000/data
 ### Delete All Data
 
 ```python
-# Request:
+# Request Locally (Docker):
 curl -X DELETE http://localhost:5000/data
+```
+```python
+# Request Public API (Kubernetes):
+curl -X DELETE planetarysystems.coe332.tacc.cloud/data
 ```
 ```python
 # Expected Output:
@@ -197,8 +211,12 @@ curl -X DELETE http://localhost:5000/data
 ### Retrieve Exoplanets based on Query Parameters.
 
 ```python
-# Request:
+# Request Locally (Docker):
 curl -X GET http://localhost:5000/exoplanets?min_radius=1.5&max_radius=2.5
+```
+```python
+# Request Public API (Kubernetes):
+curl -X GET planetarysystems.coe332.tacc.cloud/exoplanets?min_radius=1.5&max_radius=2.5
 ```
 ```python
 # Query Parameters:
@@ -252,10 +270,16 @@ end_year (int): The end year for discovery.
 ### Retrieve Exoplanet Data for a Specific Exoplanet from Redis.
 
 ```python
-# Request:
+# Request Locally (Docker):
 curl -X GET http://localhost:5000/exoplanets/<pl_name>
 
 curl -X GET http://localhost:5000/exoplanets/30%20Ari%20B%20b
+```
+```python
+# Request Public API (Kubernetes):
+curl -X GET planetarysystems.coe332.tacc.cloud/exoplanets/<pl_name>
+
+curl -X GET planetarysystems.coe332.tacc.cloud/exoplanets/30%20Ari%20B%20b
 ```
 ```python
 # Expected Output:
@@ -293,8 +317,12 @@ curl -X GET http://localhost:5000/exoplanets/30%20Ari%20B%20b
 ### Retrieve all unique Host Stars
 
 ```python
-# Request:
+# Request Locally (Docker):
 curl -X GET http://localhost:5000/hosts
+```
+```python
+# Request Public API (Kubernetes):
+curl -X GET planetarysystems.coe332.tacc.cloud/hosts
 ```
 ```python
 # Expected Output:
@@ -327,10 +355,16 @@ curl -X GET http://localhost:5000/hosts
 ### Retrieve all planets orbiting a specific Host Star
 
 ```python
-# Request:
+# Request (Locally) Docker:
 curl -X GET http://localhost:5000/hosts/<hostname>
 
 curl -X GET http://localhost:5000/hosts/18%20Del
+```
+```python
+# Request Public API (Kubernetes):
+curl -X GET planetarysystems.coe332.tacc.cloud/hosts/<hostname>
+
+curl -X GET planetarysystems.coe332.tacc.cloud/hosts/18%20Del
 ```
 ```python
 # Expected Output:
@@ -349,8 +383,12 @@ curl -X GET http://localhost:5000/hosts/18%20Del
 ### Retrieve all unique Discovery Facilities
 
 ```python
-# Request:
+# Request Locally (Docker):
 curl -X GET http://localhost:5000/facilities
+```
+```python
+# Request Public API (Kubernetes):
+curl -X GET planetarysystems.coe332.tacc.cloud/facilities
 ```
 ```python
 # Expected Output:
@@ -378,10 +416,16 @@ curl -X GET http://localhost:5000/facilities
 ### Retrieve all planets discovered by a specific facility
 
 ```python
-# Request:
+# Request Locally (Docker):
 curl -X GET http://localhost:5000/facilities/<facility_name>
 
 curl -X GET http://localhost:5000/facilities/Hubble%20Space%20Telescope
+```
+```python
+# Request Public API (Kubernetes):
+curl -X GET planetarysystems.coe332.tacc.cloud/facilities/<facility_name>
+
+curl -X GET planetarysystems.coe332.tacc.cloud/facilities/Hubble%20Space%20Telescope
 ```
 ```python
 # Expected Output:
@@ -399,8 +443,12 @@ curl -X GET http://localhost:5000/facilities/Hubble%20Space%20Telescope
 
 ### Get information about all endpoints
 ```python
-# Request:
+# Request Locally (Docker):
 curl -X GET http://localhost:5000/help
+```
+```python
+# Request Public API (Kubernetes):
+curl -X GET planetarysystems.coe332.tacc.cloud/help
 ```
 ```python
 # Expected Output:
@@ -426,8 +474,12 @@ The application provides several API endpoints to manage and process jobs. These
 
 ### Submit Job
 ```python
-# Request:
+# Request Locally (Docker):
 curl -X POST http://localhost:5000/jobs -H "Content-Type: application/json" -d '{"bin_size": 1.5}'
+```
+```python
+# Request Public API (Kubernetes):
+curl -X POST planetarysystems.coe332.tacc.cloud/jobs -H "Content-Type: application/json" -d '{"bin_size": 1.5}'
 ```
 ```python
 # Expected Output:
@@ -443,8 +495,12 @@ curl -X POST http://localhost:5000/jobs -H "Content-Type: application/json" -d '
 
 ### Get All Job IDs
 ```python
-# Request:
+# Request Locally (Docker):
 curl -X GET http://localhost:5000/jobs
+```
+```python
+# Request Public API (Kubernetes):
+curl -X GET planetarysystems.coe332.tacc.cloud/jobs
 ```
 ```python
 # Expected Output:
@@ -460,10 +516,16 @@ curl -X GET http://localhost:5000/jobs
 
 ### Get the Status of a Specific Job
 ```python
-# Request:
+# Request Locally (Docker):
 curl -X GET http://localhost:5000/jobs/<jobid>
 
 curl -X GET http://localhost:5000/jobs/1d30b65d-e4fb-462a-a904-7d32d3bb9293
+```
+```python
+# Request Public API (Kubernetes):
+curl -X GET planetarysystems.coe332.tacc.cloud/jobs/<jobid>
+
+curl -X GET planetarysystems.coe332.tacc.cloud/jobs/1d30b65d-e4fb-462a-a904-7d32d3bb9293
 ```
 ```python
 # Expected Output:
@@ -478,10 +540,16 @@ curl -X GET http://localhost:5000/jobs/1d30b65d-e4fb-462a-a904-7d32d3bb9293
 
 ### Get Results of a Specific Job
 ```python
-# Request: 
+# Request Locally (Docker): 
 curl -X GET -o histogram.png http://localhost:5000/results/<jobid>
 
 curl -X GET -o histogram.png http://localhost:5000/results/1d30b65d-e4fb-462a-a904-7d32d3bb9293
+```
+```python
+# Request Public API (Kubernetes):
+curl -X GET -o histogram.png planetarysystems.coe332.tacc.cloud/jobs<jobid>
+
+curl -X GET -o histogram.png planetarysystems.coe332.tacc.cloud/jobs/1d30b65d-e4fb-462a-a904-7d32d3bb9293
 ```
 #### Expected Output
 <img src="histogram.png" alt="Histogram Figure" width="600">
