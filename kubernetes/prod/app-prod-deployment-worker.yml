@@ -22,4 +22,8 @@ spec:
           command: [python3, src/worker.py]
           env:
             - name: REDIS_HOST
-              value: "Planetary_Systems-redis-service"
+              value: "planetarysystems-redis-service"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: LOG_LEVEL
+              value: "DEBUG"
