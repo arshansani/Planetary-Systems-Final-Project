@@ -55,7 +55,7 @@ This Flask-based web application interfaces with the NASA Exoplanet Archive, all
     - `pytest -v`
 
 ## API Examples & Result Interpretation
-### Gene Data Endpoints
+### Exoplanet Data Endpoints
 The application provides several API endpoints to access different subsets of the Planetary Systems data. Below is a description of each endpoint and how to use them:
 
 
@@ -138,11 +138,13 @@ curl -X GET http://localhost:5000/exoplanets?min_radius=1.5&max_radius=2.5
 ```
 ```python
 # Query Parameters:
+'''
 min_radius (float): The minimum radius value in Earth radii.
 max_radius (float): The maximum radius value in Earth radii.
 method (str): The discovery method.
 start_year (int): The start year for discovery.
 end_year (int): The end year for discovery.
+'''
 ```
 ```python
 # Expected Output:
@@ -172,6 +174,13 @@ end_year (int): The end year for discovery.
   ...
 ]
 ```
+- Query Parameters:
+  - min_radius (float): The minimum radius value in Earth radii.
+  - max_radius (float): The maximum radius value in Earth radii.
+  - method (str): The discovery method.
+  - start_year (int): The start year for discovery.
+  - end_year (int): The end year for discovery.
+
 - Output will be filtered based on query parameters.
 - Be sure to replace any spaces between the words within a discovery methods name with a "%20".
 
@@ -327,54 +336,72 @@ curl -X GET http://localhost:5000/facilities/Hubble%20Space%20Telescope
 
 ### Job Endpoints
 The application provides several API endpoints to manage and process jobs. These endpoints allow you to submit new jobs, retrieve job IDs, and check the status of specific jobs. Below is a description of each job endpoint and how to use them:
-- `/jobs` (Submit Job):
-    - **Description**: Submits a new job to count the number of genes in each locus group for the given HGNC ID range.
-    - **Usage**: `POST /jobs`
-    - **Required Parameters**:
-        - `bin_size`: The bin size used for the planetary size histogram (float).
-    - **Example Usage**:
-        - Use the following if running on a Unix operating system
-            - `curl localhost:5000/jobs -X POST -d '{"bin_size":1.5}' -H "Content-Type: application/json"`
-        - Use the following if running on the Windows operating system
-            - `curl localhost:5000/jobs -X POST -d "{\"bin_size\":1.5}" -H "Content-Type: application/json"`
-    - **Output**: JSON data representing the submitted job.
-        - `{
-            "id": "c69cb71c-47a9-4801-aed9-de725bd339e7",
-            "bin_size": 1.5,
-            "status": "submitted"
-            }`
-- `/jobs` (Get Job IDs):
-    - **Description**: Retrieves a list of all job IDs.
-    - **Usage**: `GET /jobs`
-    - **Example Usage**:
-        - `curl -X GET localhost:5000/jobs`
-    - **Output**: A JSON array containing all job IDs.
-        - `[
-            "1d30b65d-e4fb-462a-a904-7d32d3bb9293",
-            "8a054a82-1693-4b47-ad21-7342512f9548",
-            "be6de1a0-5d8c-4aac-bcaa-1b8ed7b78845",
-            "a48f0a18-55f4-45d8-aa5f-482f1131a584",
-            "c69cb71c-47a9-4801-aed9-de725bd339e7"
-            ]`
-- `/jobs/<jobid>` (Get Job Status):
-    - **Description**: Retrieves the status of a specific job.
-    - **Usage**: `GET /jobs/<jobid>`
-        - Replace `<jobid>` with the desired job ID.
-    - **Example Usage**:
-        - `curl -X GET localhost:5000/jobs/<jobid>`
-    - **Output**: JSON data representing the status of the specified job.
-        - `{
-            "id": "1d30b65d-e4fb-462a-a904-7d32d3bb9293",
-            "bin_size": 1.5,
-            "status": "complete"
-            }`
-- `/results/<jobid>` (Get Job Results):
-    - **Description**: Retrieves the results of a specific job.
-    - **Usage**: `GET /results/<jobid>`
-        - Replace `<jobid>` with the desired job ID.
-    - **Example Usage**:
-        - `curl -X GET -o histogram.png http://localhost:5000/results/<jobid>`
-    - **Output**: Saves a histogram plot with the name "`histogram.png`" to the local directory.
+
+### Submit Job
+```python
+# Request:
+curl -X POST http://localhost:5000/jobs -H "Content-Type: application/json" -d '{"bin_size": 1.5}'
+```
+```python
+# Expected Output:
+[
+  "id": "c69cb71c-47a9-4801-aed9-de725bd339e7", 
+  "bin_size": 1.5,
+  "status": "submitted"
+]
+```
+- Required Parameters:
+  - bin_size (float): The bin size used for the planetary size histogram.
+- Submits a new job to plot a histogram of planetary sizes (radii) using the given bin size.
+
+### Get All Job IDs
+```python
+# Request:
+curl -X GET http://localhost:5000/jobs
+```
+```python
+# Expected Output:
+[
+  "1d30b65d-e4fb-462a-a904-7d32d3bb9293",
+  "8a054a82-1693-4b47-ad21-7342512f9548",
+  "be6de1a0-5d8c-4aac-bcaa-1b8ed7b78845", 
+  "a48f0a18-55f4-45d8-aa5f-482f1131a584",
+  "c69cb71c-47a9-4801-aed9-de725bd339e7"
+]
+```
+- Retrieves a list of all job IDs.
+
+### Get Status of a Specific Job
+```python
+# Request:
+curl -X GET http://localhost:5000/jobs/<jobid>
+
+curl -X GET http://localhost:5000/jobs/1d30b65d-e4fb-462a-a904-7d32d3bb9293
+```
+```python
+# Expected Output:
+[
+  "id": "1d30b65d-e4fb-462a-a904-7d32d3bb9293",
+  "bin_size": 1.5,
+  "status": "complete"
+]
+```
+- Retrieves the status of a specific job.
+- Replace <jobid> in the URL with the desired job ID.
+
+### Get Results of a Specific Job
+```python
+# Request: 
+curl -X GET -o histogram.png http://localhost:5000/results/<jobid>
+
+curl -X GET -o histogram.png http://localhost:5000/results/1d30b65d-e4fb-462a-a904-7d32d3bb9293
+```
+#### Expected Output
+<img src="histogram.png" alt="Histogram Figure" width="600">
+
+- Retrieves the results of a specific job.
+- Replace <jobid> in the URL with the desired job ID.
+- The output will be a histogram plot saved with the name "histogram.png" to the local directory.
 
 ## Data Description
 The link directs to the NASA Exoplanet Archive, a comprehensive database housing information on exoplanets—planets orbiting stars beyond our solar system. This dataset likely comprises a wealth of data regarding these distant worlds, including their names or designations, physical characteristics, and orbital properties. Each entry in the dataset corresponds to a specific exoplanet, with columns representing various attributes such as mass, radius, orbital period, temperature, and distance from their respective host stars. Users can navigate through the dataset using filters and search options provided by the Exoplanet Archive interface, enabling them to explore and analyze the diverse range of exoplanetary systems discovered by astronomers worldwide.
