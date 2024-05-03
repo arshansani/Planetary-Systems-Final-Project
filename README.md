@@ -16,43 +16,106 @@ This Flask-based web application interfaces with the NASA Exoplanet Archive, all
 - `test\test_api.py`: A pytest integration test to verify all aspects of api.py are functional.
 - `test\test_jobs.py`: A pytest integration test to verify all aspects of jobs.py are functional.
 - `test\test_worker.py`: A pytest integration test to verify all aspects of worker.py are functional.
-- `kubernetes\prod\app-prod-deployment-flask.yml`:
-- `kubernetes\prod\app-prod-deployment-redis.yml`:
-- `kubernetes\prod\app-prod-deployment-worker.yml`:
-- `kubernetes\prod\app-prod-ingress-flask.yml`:
-- `kubernetes\prod\app-prod-pvc-redis.yml`:
-- `kubernetes\prod\app-prod-service-flask.yml`:
-- `kubernetes\prod\app-prod-service-nodeport-flask.yml`:
-- `kubernetes\prod\app-prod-service-redis.yml`:
-- `kubernetes\test\app-test-deployment-flask.yml`:
-- `kubernetes\test\app-test-deployment-redis.yml`:
-- `kubernetes\test\app-test-deployment-worker.yml`:
-- `kubernetes\test\app-test-ingress-flask.yml`:
-- `kubernetes\test\app-test-pvc-redis.yml`:
-- `kubernetes\test\app-test-service-flask.yml`:
-- `kubernetes\test\app-test-service-nodeport-flask.yml`:
-- `kubernetes\test\app-test-service-redis.yml`:
+- `kubernetes\prod\app-prod-deployment-flask.yml`: YAML file defining the Kubernetes deployment configuration for a Flask application in a production environment.
+- `kubernetes\prod\app-prod-deployment-redis.yml`: YAML file defining the Kubernetes deployment configuration for a Redis instance in a production environment.
+- `kubernetes\prod\app-prod-deployment-worker.yml`: YAML file defining the Kubernetes deployment configuration for a worker component in a production environment.
+- `kubernetes\prod\app-prod-ingress-flask.yml`: YAML file defining the Kubernetes Ingress configuration for routing traffic to the Flask application in a production environment.
+- `kubernetes\prod\app-prod-pvc-redis.yml`: YAML file defining the Kubernetes PersistentVolumeClaim (PVC) configuration for a Redis instance in a production environment.
+- `kubernetes\prod\app-prod-service-flask.yml`: YAML file defining the Kubernetes service configuration for exposing the Flask application internally in a production environment.
+- `kubernetes\prod\app-prod-service-nodeport-flask.yml`: YAML file defining the Kubernetes NodePort service configuration for exposing the Flask application externally in a production environment.
+- `kubernetes\prod\app-prod-service-redis.yml`: YAML file defining the Kubernetes service configuration for exposing the Redis instance internally in a production environment.
+- `kubernetes\test\app-test-deployment-flask.yml`: YAML file defining the Kubernetes deployment configuration for a Flask application in a test environment.
+- `kubernetes\test\app-test-deployment-redis.yml`: YAML file defining the Kubernetes deployment configuration for a Redis instance in a test environment.
+- `kubernetes\test\app-test-deployment-worker.yml`: YAML file defining the Kubernetes deployment configuration for a worker component in a test environment.
+- `kubernetes\test\app-test-ingress-flask.yml`: YAML file defining the Kubernetes Ingress configuration for routing traffic to the Flask application in a test environment.
+- `kubernetes\test\app-test-pvc-redis.yml`: YAML file defining the Kubernetes PersistentVolumeClaim (PVC) configuration for a Redis instance in a test environment.
+- `kubernetes\test\app-test-service-flask.yml`: YAML file defining the Kubernetes service configuration for exposing the Flask application internally in a test environment.
+- `kubernetes\test\app-test-service-nodeport-flask.yml`: YAML file defining the Kubernetes NodePort service configuration for exposing the Flask application externally in a test environment.
+- `kubernetes\test\app-test-service-redis.yml`: YAML file defining the Kubernetes service configuration for exposing the Redis instance internally in a test environment.
 
 ## Getting Started
 ### Prerequisites
-- Docker installed on host machine
+- Docker installed on the host machine
 - Internet connection
+- Clone this repo to Jetstream VM (or any other environment configured with the TACC Kubernetes cluster)
 
 ### Data Source
 - The Planetary Systems data is sourced from the NASA Exoplanet archive: [Planetary Systems Dataset](https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=PSCompPars).
-- This JSON file contains comprehensive information about planet's orbital period, planet mass, planet radius, discovery method, and various other physical and orbital characteristics. The dataset also provides information about the host stars of these exoplanets, such as their mass, radius, temperature, and luminosity.
+- This JSON file contains comprehensive information about the planet's orbital period, planet mass, planet radius, discovery method, and various other physical and orbital characteristics. The dataset also provides information about the host stars of these exoplanets, such as their mass, radius, temperature, and luminosity.
 - Dataset Citation: NASA Exoplanet Archive. NASA Exoplanet Science Institute. Retrieved from https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=PSCompPars
 
-### Running the Containerized App
-- Navigate to the directory containing the Dockerfile & docker-compose.yml.
-- Build and deploy the Flask app and Redis containers: 
-    - `docker-compose up --build -d`
-    - This command builds the Docker images based on the Dockerfile and starts the containers, deploying the Flask app and worker in separate containers. Another container is created for the Redis database.
+## Deployment with Kubernetes
+  
+To run the production environment, run the following command:
 
-### Running the Integration Tests
+`kubectl apply -f kubernetes/prod/`
+
+To run the test environment, run the following command:
+
+`kubectl apply -f kubernetes/test/`
+
+
+To check if the deployments, services, and ingress resources are running, use the following command:
+
+### To check pods: 
+```bash
+# Request:
+kubectl get pods
+```
+```bash
+# Expected Output:
+NAME                                   READY   STATUS    RESTARTS    AGE
+flask-deployment-6c786544fb-zqs6g       1/1     Running     0        19m
+redis-pvc-deployment-65db48447b-6f5pl   1/1     Running     0        20m
+worker-deployment-59bd4f9c65-qfl2x      1/1     Running     0        19m
+```
+
+### To check services: 
+```bash
+# Request:
+kubectl get services
+```
+```bash
+# Expected Output
+NAME                                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+planetarysystems-flask-nodeport-service   NodePort    10.233.37.100   <none>        5000:31380/TCP   20m
+planetarysystems-flask-service            ClusterIP   10.233.36.169   <none>        5000/TCP         20m
+planetarysystems-redis-service            ClusterIP   10.233.13.209   <none>        6379/TCP         20m
+```
+
+### To check Ingress
+```bash
+# Request:
+kubectl get ingress
+```
+```bash
+# Expected Output
+NAME                             CLASS   HOSTS                                ADDRESS                                                    PORTS   AGE
+planetarysystems-flask-ingress   nginx   planetarysystems.coe332.tacc.cloud   129.114.36.240,129.114.36.49,129.114.36.83,129.114.38.92   80      23m
+```
+
+Now the web application should be running with a public API point at `planetarysystems.coe332.tacc.cloud`
+
+## Building the Docker Image and Launching Containerized App and Redis using Docker Compose
+
+- To build the Docker image from the provided Dockerfile, execute the following command in the project directory:
+  
+ `docker-compose up --build -d`
+
+- To see the containers that are running, execute the command:
+  
+ `docker ps -a`
+
+- Once you are ready to kill the services, run the following:
+  
+ `docker-compose down`
+
+## Running the Integration Tests
 - Navigate to the same directory containing the Dockerfile & docker-compose.yml.
 - Run the following command to run the integration tests (this may take up to two minutes):
-    - `pytest -v`
+
+ `pytest -v`
+
 
 ## API Examples & Result Interpretation
 
@@ -357,7 +420,7 @@ curl -X GET http://localhost:5000/help
 }
 ```
 
-### Job Endpoints
+## Job Endpoints
 The application provides several API endpoints to manage and process jobs. These endpoints allow you to submit new jobs, retrieve job IDs, and check the status of specific jobs. Below is a description of each job endpoint and how to use them:
 
 ### Submit Job
@@ -394,7 +457,7 @@ curl -X GET http://localhost:5000/jobs
 ```
 - Retrieves a list of all job IDs.
 
-### Get Status of a Specific Job
+### Get the Status of a Specific Job
 ```python
 # Request:
 curl -X GET http://localhost:5000/jobs/<jobid>
