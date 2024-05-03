@@ -15,6 +15,22 @@ spec:
       labels:
         app: worker-app
     spec:
+      initContainers:
+        - name: redis-pvc-deployment
+          image: busybox
+          command:
+            - sh
+            - -c
+            - >
+              until nc -z $REDIS_HOST $REDIS_PORT; do
+                echo "Waiting for Redis server at $REDIS_HOST:$REDIS_PORT...";
+                sleep 2;
+              done;
+          env:
+            - name: REDIS_HOST
+              value: "planetarysystems-redis-service"
+            - name: REDIS_PORT
+              value: "6379"
       containers:
         - name: worker
           imagePullPolicy: Always
