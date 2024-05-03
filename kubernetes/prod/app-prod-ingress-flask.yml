@@ -2,7 +2,7 @@
 kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: planetarysystemsapp-flask-ingress
+  name: planetarysystems-flask-ingress
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
