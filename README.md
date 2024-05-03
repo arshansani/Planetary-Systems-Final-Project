@@ -5,7 +5,7 @@ This Flask-based web application interfaces with the NASA Exoplanet Archive, all
 
 ## Contents
 - `Dockerfile`: Defines the Docker container setup for the Flask application.
-- `diagram.png`: A diagram depicting
+- `diagram.png`: A diagram that illustrates the architecture and flow of interactions within your Flask API-based web application
 - `README.md`: Provides information on how to use and deploy the API.
 - `docker-compose.yml`: Automates the deployment of the Flask app and Redis containers.
 - `requirements.txt`: Lists the required Python libraries to be installed in the container.
