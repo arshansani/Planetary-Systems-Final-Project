@@ -213,6 +213,7 @@ curl -X GET http://localhost:5000/exoplanets/30%20Ari%20B%20b
 ```python
 # Request:
 curl -X GET http://localhost:5000/hosts
+```
 ```python
 # Expected Output:
 [
@@ -248,6 +249,7 @@ curl -X GET http://localhost:5000/hosts
 curl -X GET http://localhost:5000/hosts/<hostname>
 
 curl -X GET http://localhost:5000/hosts/18%20Del
+```
 ```python
 # Expected Output:
 {
@@ -267,6 +269,7 @@ curl -X GET http://localhost:5000/hosts/18%20Del
 ```python
 # Request:
 curl -X GET http://localhost:5000/facilities
+```
 ```python
 # Expected Output:
 [
@@ -297,6 +300,7 @@ curl -X GET http://localhost:5000/facilities
 curl -X GET http://localhost:5000/facilities/<facility_name>
 
 curl -X GET http://localhost:5000/facilities/Hubble%20Space%20Telescope
+```
 ```python
 # Expected Output:
 [
