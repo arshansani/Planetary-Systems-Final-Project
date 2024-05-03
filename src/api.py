@@ -14,6 +14,7 @@ app = Flask(__name__)
 log_level = os.environ.get('LOG_LEVEL', 'WARNING')
 logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(message)s')
 
+# Debugging information
 logging.debug(f"Logging level set to: {log_level}")
 logging.debug(f"Connecting to Redis at address: {os.environ.get('REDIS_HOST')}")
 logging.debug(f"Connecting to Redis at port: {os.environ.get('REDIS_PORT')}")
