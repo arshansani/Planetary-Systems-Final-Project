@@ -137,6 +137,14 @@ curl -X DELETE http://localhost:5000/data
 curl -X GET http://localhost:5000/exoplanets?min_radius=1.5&max_radius=2.5
 ```
 ```python
+# Query Parameters:
+min_radius (float): The minimum radius value in Earth radii.
+max_radius (float): The maximum radius value in Earth radii.
+method (str): The discovery method.
+start_year (int): The start year for discovery.
+end_year (int): The end year for discovery.
+```
+```python
 # Expected Output:
 [ ...
   ,"Kepler-1272 b",
@@ -163,11 +171,12 @@ curl -X GET http://localhost:5000/exoplanets?min_radius=1.5&max_radius=2.5
   "Kepler-100 d",
   ...
 ]
-
 ```
+- Output will be filtered based on query parameters.
+- Be sure to replace any spaces between the words within a discovery methods name with a "%20".
 
 
-### Retrieve Exoplanet Data for a Specific Exoplanet host name from Redis.
+### Retrieve Exoplanet Data for a Specific Exoplanet Host Name from Redis.
 
 ```python
 # Request:
@@ -242,7 +251,7 @@ curl -X GET http://localhost:5000/hosts
 ```
 
 
-### Retrieve all unique Host Stars
+### Retrieve all planets orbiting a specific Host Star
 
 ```python
 # Request:
@@ -293,7 +302,7 @@ curl -X GET http://localhost:5000/facilities
 ```
 
 
-### Retrieve all Planets Discovered by a Specific Facility
+### Retrieve all planets discovered by a specific facility
 
 ```python
 # Request:
@@ -322,25 +331,23 @@ The application provides several API endpoints to manage and process jobs. These
     - **Description**: Submits a new job to count the number of genes in each locus group for the given HGNC ID range.
     - **Usage**: `POST /jobs`
     - **Required Parameters**:
-        - `start`: The start value for the job (integer).
-        - `end`: The end value for the job (integer).
+        - `bin_size`: The bin size used for the planetary size histogram (float).
     - **Example Usage**:
         - Use the following if running on a Unix operating system
-            - `curl localhost:5000/jobs -X POST -d '{"start":1, "end":100}' -H "Content-Type: application/json"`
+            - `curl localhost:5000/jobs -X POST -d '{"bin_size":1.5}' -H "Content-Type: application/json"`
         - Use the following if running on the Windows operating system
-            - `curl localhost:5000/jobs -X POST -d "{\"start\":1, \"end\":100}" -H "Content-Type: application/json"`
+            - `curl localhost:5000/jobs -X POST -d "{\"bin_size\":1.5}" -H "Content-Type: application/json"`
     - **Output**: JSON data representing the submitted job.
         - `{
-            "end": 100,
             "id": "c69cb71c-47a9-4801-aed9-de725bd339e7",
-            "start": 1,
+            "bin_size": 1.5,
             "status": "submitted"
             }`
 - `/jobs` (Get Job IDs):
     - **Description**: Retrieves a list of all job IDs.
     - **Usage**: `GET /jobs`
     - **Example Usage**:
-        - `curl localhost:5000/jobs -X GET`
+        - `curl -X GET localhost:5000/jobs`
     - **Output**: A JSON array containing all job IDs.
         - `[
             "1d30b65d-e4fb-462a-a904-7d32d3bb9293",
@@ -354,12 +361,11 @@ The application provides several API endpoints to manage and process jobs. These
     - **Usage**: `GET /jobs/<jobid>`
         - Replace `<jobid>` with the desired job ID.
     - **Example Usage**:
-        - `curl localhost:5000/jobs/<jobid> -X GET`
+        - `curl -X GET localhost:5000/jobs/<jobid>`
     - **Output**: JSON data representing the status of the specified job.
         - `{
-            "end": 2,
             "id": "1d30b65d-e4fb-462a-a904-7d32d3bb9293",
-            "start": 1,
+            "bin_size": 1.5,
             "status": "complete"
             }`
 - `/results/<jobid>` (Get Job Results):
@@ -367,13 +373,8 @@ The application provides several API endpoints to manage and process jobs. These
     - **Usage**: `GET /results/<jobid>`
         - Replace `<jobid>` with the desired job ID.
     - **Example Usage**:
-        - `curl localhost:5000/results/<jobid> -X GET`
-    - **Output**: JSON data representing the number of genes in each locus group.
-        - `{
-            "other": 1,
-            "protein-coding gene": 70,
-            "pseudogene": 7
-            }`
+        - `curl -X GET -o histogram.png http://localhost:5000/results/<jobid>`
+    - **Output**: Saves a histogram plot with the name "`histogram.png`" to the local directory.
 
 ## Data Description
 The link directs to the NASA Exoplanet Archive, a comprehensive database housing information on exoplanets—planets orbiting stars beyond our solar system. This dataset likely comprises a wealth of data regarding these distant worlds, including their names or designations, physical characteristics, and orbital properties. Each entry in the dataset corresponds to a specific exoplanet, with columns representing various attributes such as mass, radius, orbital period, temperature, and distance from their respective host stars. Users can navigate through the dataset using filters and search options provided by the Exoplanet Archive interface, enabling them to explore and analyze the diverse range of exoplanetary systems discovered by astronomers worldwide.
@@ -407,3 +408,5 @@ The key fields in the Planetary Systems data were retrieved from the NASA Exopla
 
 
 ## Software Architecture Diagram
+- The software architecture diagram visualizes the Dockerized environment of the api.py Flask app running locally as well as the dockerized database and worker. Within the Docker containers, the Flask App is depicted as `api.py` running within the "flask-api-1" container. The communications between the various containers are denoted using arrows as well as the communications out of the containers to the client. The diagram also illustrates the integration tests managed by pytest running outside the docker container and the flow of data from the web to the database.
+![Software Architecture Diagram](diagram.png)
