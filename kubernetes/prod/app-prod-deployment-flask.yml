@@ -18,7 +18,7 @@ spec:
       containers:
         - name: flask-app
           imagePullPolicy: Always
-          image: arshan/flask_app:1.0
+          image: arshansani/flask_app:1.0
           command: [python3, src/api.py]
           ports:
             - name: http
