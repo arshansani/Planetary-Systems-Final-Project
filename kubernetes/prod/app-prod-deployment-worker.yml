@@ -19,7 +19,7 @@ spec:
         - name: worker
           imagePullPolicy: Always
           image: arshdauwa/worker:1.0
-          command: [python3, worker.py]
+          command: [python3, src/worker.py]
           env:
             - name: REDIS_HOST
               value: "Planetary_Systems-redis-service"
