@@ -7,7 +7,7 @@ services:
         ports:
             - 6379:6379
         user: "1000:1000"
-        command: ["--save", "1", "1"]
+        command: ["--save", "60", "10"]
     flask-api:
         image: username/flask_app:1.0
         build:

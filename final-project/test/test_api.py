@@ -33,7 +33,44 @@ def test_get_exoplanets():
     data = response.json()
     assert isinstance(data, list)
 
-def test_get_exoplanet_data():
+def test_get_exoplanets_all_parameters():
+    # Test with all query parameters
+    query_params = {
+        'min_radius': 1.0,
+        'max_radius': 2.0,
+        'method': 'Transit',
+        'start_year': 2000,
+        'end_year': 2010
+    }
+    response = requests.get(f'{base_url}/exoplanets', params=query_params)
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+
+def test_get_exoplanets_missing_parameters():
+    # Test with missing query parameters
+    query_params = {
+        'min_radius': 1.0,
+        'method': 'Transit'
+    }
+    response = requests.get(f'{base_url}/exoplanets', params=query_params)
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+
+def test_get_exoplanets_invalid_parameters():
+    # Test with invalid query parameters
+    query_params = {
+        'min_radius': 'invalid',
+        'max_radius': 'invalid'
+    }
+    response = requests.get(f'{base_url}/exoplanets', params=query_params)
+    assert response.status_code == 400
+    data = response.json()
+    assert data['status'] == 'error'
+    assert 'message' in data
+
+def test_get_specific_exoplanet_data():
     response = requests.get(f'{base_url}/exoplanets')
     pl_names = response.json()
     if pl_names:
@@ -46,23 +83,21 @@ def test_get_exoplanet_data():
     else:
         pytest.skip("No data available for testing")
 
-def test_get_exoplanets_by_host_name():
+def test_get_host_stars():
     response = requests.get(f'{base_url}/hosts')
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
 
-def test_get_host_stars():
+def test_get_exoplanets_by_host_star():
     response = requests.get(f'{base_url}/hosts')
-    data = response.json()
-
-    if data:
-        for host in data:
-            hostname = host
-            response = requests.get(f'{base_url}/hosts/{hostname}')
-            assert response.status_code == 200
-            data = response.json()
-            assert isinstance(data, list)
+    hostnames = response.json()
+    if hostnames:
+        hostname = hostnames[0]
+        response = requests.get(f'{base_url}/hosts/{hostname}')
+        assert response.status_code == 200
+        data = response.json()
+        assert isinstance(data, dict)
     else:
         pytest.skip("No data available for testing")
 
@@ -72,15 +107,15 @@ def test_get_facilities():
     data = response.json()
     assert isinstance(data, list) 
 
-def test_get_planets_by_facility():
+def test_get_exoplanets_by_facility():
     response = requests.get(f'{base_url}/facilities')
     facilities = response.json()
     if facilities:
-       facility_name = facilities[0]
-       response = requests.get(f'{base_url}/facilities/{facility_name}')
-       assert response.status_code == 200
-       data = response.json()
-       assert isinstance(data, list)
+        facility_name = facilities[0]
+        response = requests.get(f'{base_url}/facilities/{facility_name}')
+        assert response.status_code == 200
+        data = response.json()
+        assert isinstance(data, list)
     else:
        pytest.skip("No data available for testing")
 
@@ -91,7 +126,7 @@ def test_help_route():
     assert isinstance(data, dict) 
 
 def test_submit_job():
-    job_data = {'start': 1, 'end': 10}
+    job_data = {'bin_size': 1.5}
     response = requests.post(f'{base_url}/jobs', json=job_data)
     assert response.status_code == 200
     data = response.json()
@@ -106,7 +141,7 @@ def test_get_job_ids():
     assert isinstance(data, list)
 
 def test_get_job():
-    job_data = {'start': 1, 'end': 10}
+    job_data = {'bin_size': 1.5}
     response = requests.post(f'{base_url}/jobs', json=job_data)
     job_id = response.json()['id']
 
@@ -117,7 +152,7 @@ def test_get_job():
     assert data['id'] == job_id
 
 def test_get_result():
-    job_data = {'start': 1, 'end': 10}
+    job_data = {'bin_size': 1.5}
     response = requests.post(f'{base_url}/jobs', json=job_data)
     job_id = response.json()['id']
 

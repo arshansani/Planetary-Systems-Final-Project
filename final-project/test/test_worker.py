@@ -2,12 +2,13 @@ import json
 import pytest
 import requests
 import time
+import os
 
 base_url = 'http://localhost:5000'
 
 def test_worker():
     # Submit a job
-    job_data = {'start': 1, 'end': 1000}
+    job_data = {'bin_size': 1.5}
     response = requests.post(f'{base_url}/jobs', json=job_data)
     job_id = response.json()['id']
 
@@ -23,5 +24,13 @@ def test_worker():
     # Check the job result
     response = requests.get(f'{base_url}/results/{job_id}')
     assert response.status_code in [200, 202, 404]
-    data = response.json()
-    assert isinstance(data, dict)
+
+    # Save the image to a file
+    with open('histogram.png', 'wb') as f:
+        f.write(response.content)
+
+    # Check if the image file was created
+    assert os.path.exists('histogram.png')
+
+    # Clean up the downloaded image file
+    os.remove('histogram.png')

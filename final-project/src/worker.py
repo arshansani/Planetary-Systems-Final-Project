@@ -33,24 +33,30 @@ def do_work(jobid: str) -> None:
             if radius:
                 planet_radii.append(radius)
 
+        # Create a new figure
+        fig, ax = plt.subplots(figsize=(8, 6))
+
         # Plot the histogram
-        plt.figure(figsize=(8, 6))
         bins = np.arange(0, max(planet_radii) + bin_size, bin_size)
-        plt.hist(planet_radii, bins=bins, edgecolor='black')
-        plt.xlabel('Planet Radius (Earth Radii)')
-        plt.ylabel('Count')
-        plt.title('Distribution of Planet Sizes')
+        ax.hist(planet_radii, bins=bins, edgecolor='black')
+        ax.set_xlabel('Planet Radius (Earth Radii)')
+        ax.set_ylabel('Count')
+        ax.set_title('Distribution of Planet Sizes')
 
         # Save the plot to a bytes buffer
         buffer = io.BytesIO()
-        plt.savefig(buffer, format='png')
+        fig.savefig(buffer, format='png')
         buffer.seek(0)
 
         # Store the plot data in the results database
         rdb.set(jobid, buffer.getvalue())
 
+        # Close the figure to free up memory
+        plt.close(fig)
+
         logging.info(f"Job {jobid} completed")
         update_job_status(jobid, "complete")
+
     except Exception as e:
         logging.error(f"Error processing job {jobid}: {e}")
         update_job_status(jobid, "failed")

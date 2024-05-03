@@ -5,7 +5,7 @@ import requests
 base_url = 'http://localhost:5000'
 
 def test_add_job():
-    job_data = {'start': 1, 'end': 10}
+    job_data = {'bin_size': 1.5}
     response = requests.post(f'{base_url}/jobs', json=job_data)
     assert response.status_code == 200
     data = response.json()
@@ -14,7 +14,7 @@ def test_add_job():
     assert data['status'] == 'submitted'
 
 def test_get_job_by_id():
-    job_data = {'start': 1, 'end': 10}
+    job_data = {'bin_size': 2.5}
     response = requests.post(f'{base_url}/jobs', json=job_data)
     job_id = response.json()['id']
 
