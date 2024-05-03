@@ -547,9 +547,9 @@ curl -X GET -o histogram.png http://localhost:5000/results/1d30b65d-e4fb-462a-a9
 ```
 ```python
 # Request Public API (Kubernetes):
-curl -X GET -o histogram.png planetarysystems.coe332.tacc.cloud/jobs<jobid>
+curl -X GET -o histogram.png planetarysystems.coe332.tacc.cloud/results/<jobid>
 
-curl -X GET -o histogram.png planetarysystems.coe332.tacc.cloud/jobs/1d30b65d-e4fb-462a-a904-7d32d3bb9293
+curl -X GET -o histogram.png planetarysystems.coe332.tacc.cloud/results/1d30b65d-e4fb-462a-a904-7d32d3bb9293
 ```
 #### Expected Output
 <img src="histogram.png" alt="Histogram Figure" width="600">
