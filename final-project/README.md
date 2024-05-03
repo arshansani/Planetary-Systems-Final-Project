@@ -5,7 +5,7 @@ This Flask-based web application interfaces with the NASA Exoplanet Archive, all
 
 ## Contents
 - `Dockerfile`: Defines the Docker container setup for the Flask application.
-- `diagram.png`:
+- `diagram.png`: A diagram depicting
 - `README.md`: Provides information on how to use and deploy the API.
 - `docker-compose.yml`: Automates the deployment of the Flask app and Redis containers.
 - `requirements.txt`: Lists the required Python libraries to be installed in the container.
@@ -55,9 +55,25 @@ This Flask-based web application interfaces with the NASA Exoplanet Archive, all
     - `pytest -v`
 
 ## API Examples & Result Interpretation
+
+### API Documentation
+
+```python
+# Request:
+curl -X GET http://localhost:5000/help
+```
+```python
+# Expected Output:
+...
+"/exoplanets": {
+    "doc": "Retrieve exoplanets based on query parameters. Query Parameters: min_radius (float): The minimum radius value in Earth radii. max_radius (float): The maximum radius value in Earth radii. method (str): The discovery method. start_year (int): The start year for discovery. end_year (int): The end year for discovery. Returns: tuple: A tuple containing the JSON response and HTTP status code.",
+    "methods": "HEAD,OPTIONS,GET"
+  },
+...
+```
+
 ### Exoplanet Data Endpoints
 The application provides several API endpoints to access different subsets of the Planetary Systems data. Below is a description of each endpoint and how to use them:
-
 
 ### Load Data
 
