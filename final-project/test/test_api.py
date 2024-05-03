@@ -44,13 +44,51 @@ def test_get_exoplanet_data():
         assert isinstance(data, dict)
         assert 'pl_name' in data
     else:
-        pytest.skip("No gene IDs available for testing")
+        pytest.skip("No data available for testing")
 
-def get_exoplanets_by_radius():
-    response = requests.get(f'{base_url}/exoplanets')
-    
+def test_get_exoplanets_by_host_name():
+    response = requests.get(f'{base_url}/hosts')
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
 
+def test_get_host_stars():
+    response = requests.get(f'{base_url}/hosts')
+    data = response.json()
 
+    if data:
+        for host in data:
+            hostname = host
+            response = requests.get(f'{base_url}/hosts/{hostname}')
+            assert response.status_code == 200
+            data = response.json()
+            assert isinstance(data, list)
+    else:
+        pytest.skip("No data available for testing")
+
+def test_get_facilities():
+    response = requests.get(f'{base_url}/facilities')
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list) 
+
+def test_get_planets_by_facility():
+    response = requests.get(f'{base_url}/facilities')
+    facilities = response.json()
+    if facilities:
+       facility_name = facilities[0]
+       response = requests.get(f'{base_url}/facilities/{facility_name}')
+       assert response.status_code == 200
+       data = response.json()
+       assert isinstance(data, list)
+    else:
+       pytest.skip("No data available for testing")
+
+def test_help_route():
+    response = requests.get(f'{base_url}/help')
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, dict) 
 
 def test_submit_job():
     job_data = {'start': 1, 'end': 10}
