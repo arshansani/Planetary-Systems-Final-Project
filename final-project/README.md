@@ -349,6 +349,29 @@ curl -X GET http://localhost:5000/facilities/Hubble%20Space%20Telescope
 - Output will differ based on the inputted facility name.
 - Be sure to replace any spaces between the words within a facility with a "%20", as shown above.
 
+### Get information about all endpoints
+```python
+# Request:
+curl -X GET http://localhost:5000/help
+```
+```python
+# Expected Output:
+{
+  "/data": {
+    "doc": "Delete exoplanet data from Redis. Returns: tuple: A tuple containing the JSON response and HTTP status code.",
+    "methods": "DELETE,OPTIONS"
+  },
+  "/exoplanets": {
+    "doc": "Retrieve exoplanets based on query parameters. Query Parameters: min_radius (float): The minimum radius value in Earth radii. max_radius (float): The maximum radius value in Earth radii. method (str): The discovery method. start_year (int): The start year for discovery. end_year (int): The end year for discovery. Returns: tuple: A tuple containing the JSON response and HTTP status code.",
+    "methods": "GET,OPTIONS,HEAD"
+  },
+  "/exoplanets/<pl_name>": {
+    "doc": "Retrieve exoplanet data for a specific exoplanet host name from Redis. Args: pl_name (str): The name of the exoplanet. Returns: tuple: A tuple containing the JSON response and HTTP status code.",
+    "methods": "GET,OPTIONS,HEAD"
+  },
+  ...
+}
+```
 
 ### Job Endpoints
 The application provides several API endpoints to manage and process jobs. These endpoints allow you to submit new jobs, retrieve job IDs, and check the status of specific jobs. Below is a description of each job endpoint and how to use them:
