@@ -185,7 +185,7 @@ end_year (int): The end year for discovery.
 - Be sure to replace any spaces between the words within a discovery methods name with a "%20".
 
 
-### Retrieve Exoplanet Data for a Specific Exoplanet Host Name from Redis.
+### Retrieve Exoplanet Data for a Specific Exoplanet from Redis.
 
 ```python
 # Request:
