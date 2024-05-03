@@ -9,7 +9,6 @@ This Flask-based web application interfaces with the NASA Exoplanet Archive, all
 - `README.md`: Provides information on how to use and deploy the API.
 - `docker-compose.yml`: Automates the deployment of the Flask app and Redis containers.
 - `requirements.txt`: Lists the required Python libraries to be installed in the container.
-- `Makefile`: Lists the required Python libraries to be installed in the container.
 - `src\api.py`: The main Flask application script for fetching, caching, and interacting with HGNC gene data.
 - `src\jobs.py`: Contains functions for managing and processing jobs.
 - `src\worker.py`: A script that runs the worker process for executing jobs.
